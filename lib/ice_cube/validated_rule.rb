@@ -16,6 +16,8 @@ module IceCube
     include Validations::Count
     include Validations::Until
 
+    attr_accessor :hoa_attributes
+
     # Validations ordered for efficiency in sequence of:
     # * descending intervals
     # * boundary limits
@@ -58,6 +60,8 @@ module IceCube
 
     def to_hash
       builder = HashBuilder.new(self)
+      builder[:hoa_attributes] = self.hoa_attributes
+
       @validations.each do |name, validations|
         validations.each do |validation|
           validation.build_hash(builder)

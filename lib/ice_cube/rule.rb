@@ -5,7 +5,7 @@ module IceCube
   class Rule
 
     attr_reader :uses
-    attr_accessor :name, :owner, :created_date
+
 
     # Is this a terminating schedule?
     def terminating?
@@ -20,6 +20,7 @@ module IceCube
     end
 
     def hash
+      # binding.pry
       h = to_hash
       h.nil? ? super : h.hash
     end
@@ -31,6 +32,7 @@ module IceCube
 
     # Yaml implementation
     def to_yaml(*args)
+      # binding.pry
       IceCube::use_psych? ? Psych::dump(to_hash) : YAML::dump(to_hash, *args)
     end
 
@@ -41,6 +43,7 @@ module IceCube
 
     # Expected to be overridden by subclasses
     def to_hash
+      # binding.pry
       nil
     end
 
@@ -52,6 +55,9 @@ module IceCube
       rule.interval(hash[:interval] || 1, TimeUtil.wday_to_sym(hash[:week_start] || 0)) if match[1] == "Weekly"
       rule.until(TimeUtil.deserialize_time(hash[:until])) if hash[:until]
       rule.count(hash[:count]) if hash[:count]
+      #custom attributes for HOA
+      rule.hoa_attributes = hash[:hoa_attributes] if hash[:hoa_attributes]
+
       hash[:validations] && hash[:validations].each do |key, value|
         key = key.to_sym unless key.is_a?(Symbol)
         value.is_a?(Array) ? rule.send(key, *value) : rule.send(key, value)
