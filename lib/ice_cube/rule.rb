@@ -5,6 +5,7 @@ module IceCube
   class Rule
 
     attr_reader :uses
+    attr_accessor :name, :owner, :created_date
 
     # Is this a terminating schedule?
     def terminating?
