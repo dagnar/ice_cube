@@ -3,7 +3,7 @@ require 'yaml'
 module IceCube
 
   class Schedule
-
+    include Mongoid::Fields::Serializable
     extend ::Deprecated
 
     # Get the start time
@@ -14,11 +14,15 @@ module IceCube
     attr_reader :end_time
     deprecated_alias :end_date, :end_time
 
+    #for HOA use
+    attr_accessor :hoa_attributes
+
     # Create a new schedule
     def initialize(start_time = nil, options = {})
       self.start_time = start_time || TimeUtil.now
       self.end_time = self.start_time + options[:duration] if options[:duration]
       self.end_time = options[:end_time] if options[:end_time]
+      self.hoa_attributes = options[:hoa_attributes] if options[:hoa_attributes]
       @all_recurrence_rules = []
       @all_exception_rules = []
       yield self if block_given?
@@ -338,6 +342,7 @@ module IceCube
       data[:extimes] = exception_times.map do |et|
         TimeUtil.serialize_time(et)
       end
+      data[:hoa_attributes] = self.hoa_attributes
       data
     end
 
@@ -364,6 +369,7 @@ module IceCube
       data[:exdates] && data[:exdates].each do |t|
         schedule.add_exception_time TimeUtil.deserialize_time(t)
       end
+      schedule.hoa_attributes = data[:hoa_attributes] if data[:hoa_attributes]
       schedule
     end
 
@@ -477,7 +483,5 @@ module IceCube
         @all_recurrence_rules
       end
     end
-
   end
-
 end
